@@ -12,18 +12,6 @@ export EMQX2_WEIGHT="${EMQX2_WEIGHT:-2}"
 export EMQX3_WEIGHT="${EMQX3_WEIGHT:-3}"
 export PORT="${PORT:-8080}"
 
-echo "Generating HAProxy configuration with:"
-echo "  EMQX1_HOST: ${EMQX1_HOST}"
-echo "  EMQX2_HOST: ${EMQX2_HOST}"
-echo "  EMQX3_HOST: ${EMQX3_HOST}"
-echo "  EMQX_MQTT_PORT: ${EMQX_MQTT_PORT}"
-echo "  EMQX_WS_PORT: ${EMQX_WS_PORT}"
-echo "  Weights: ${EMQX1_WEIGHT}/${EMQX2_WEIGHT}/${EMQX3_WEIGHT}"
-echo ""
-
 envsubst < /tmp/haproxy.cfg.template > /usr/local/etc/haproxy/haproxy.cfg
-
-echo "Generated HAProxy configuration"
-echo ""
 
 exec /usr/local/bin/docker-entrypoint.sh "$@"
