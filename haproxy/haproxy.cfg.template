@@ -1,0 +1,63 @@
+global
+  log stdout format raw local0 info
+  daemon
+  maxconn 10240
+
+defaults
+  log global
+  mode tcp
+  option tcplog
+  #option dontlognull
+  timeout connect 10000
+  # timeout > mqtt's keepalive * 1.2
+  timeout client 240s
+  timeout server 240s
+  maxconn 20000
+
+backend mqtt_backend
+  mode tcp
+  # Sticky session load balancing
+  stick-table type string len 32 size 1000k expire 30m
+  stick on req.payload(0,0),mqtt_field_value(connect,client_identifier)
+
+  server emqx1 ${EMQX1_HOST}:${EMQX_MQTT_PORT}
+  server emqx2 ${EMQX2_HOST}:${EMQX_MQTT_PORT}
+  server emqx3 ${EMQX3_HOST}:${EMQX_MQTT_PORT}
+
+frontend mqtt_servers
+  bind *:1883
+  mode tcp
+  # Wait for buffer to fill to parse MQTT packets
+  tcp-request inspect-delay 10s
+  # Reject non-MQTT connections
+  tcp-request content reject unless { req.payload(0,0),mqtt_is_valid }
+  default_backend mqtt_backend
+
+backend mqtts_backend
+  mode tcp
+  balance roundrobin
+
+  # Adding send-proxy will pass the real IP to EMQX, corresponding backend listener needs to enable proxy_protocol
+  # server emqx1 ${EMQX1_HOST}:${EMQX_MQTT_PORT} check-send-proxy send-proxy-v2 weight 5
+  server emqx1 ${EMQX1_HOST}:${EMQX_MQTT_PORT} weight ${EMQX1_WEIGHT}
+  server emqx2 ${EMQX2_HOST}:${EMQX_MQTT_PORT} weight ${EMQX2_WEIGHT}
+  server emqx3 ${EMQX3_HOST}:${EMQX_MQTT_PORT} weight ${EMQX3_WEIGHT}
+
+backend mqtt_ws_backend
+  mode tcp
+  balance roundrobin
+  server emqx1 ${EMQX1_HOST}:${EMQX_WS_PORT} check
+  server emqx2 ${EMQX2_HOST}:${EMQX_WS_PORT} check
+  server emqx3 ${EMQX3_HOST}:${EMQX_WS_PORT} check
+
+frontend mqtt_ws_frontend
+  bind *:8083
+  mode tcp
+  default_backend mqtt_ws_backend
+
+frontend stats
+  mode http
+  bind *:8888
+  stats enable
+  stats uri /stats
+  stats refresh 10s
