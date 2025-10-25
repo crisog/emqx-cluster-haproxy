@@ -69,7 +69,7 @@ frontend emqx_dashboard_frontend
   default_backend emqx_dashboard_backend
 
 frontend http_public
-  bind *:${PORT:-8080}
+  bind *:${PORT}
   mode http
 
   acl is_websocket hdr(Connection) -i upgrade

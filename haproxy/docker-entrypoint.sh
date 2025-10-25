@@ -10,6 +10,7 @@ export EMQX_DASHBOARD_PORT="${EMQX_DASHBOARD_PORT:-18083}"
 export EMQX1_WEIGHT="${EMQX1_WEIGHT:-5}"
 export EMQX2_WEIGHT="${EMQX2_WEIGHT:-2}"
 export EMQX3_WEIGHT="${EMQX3_WEIGHT:-3}"
+export PORT="${PORT:-8080}"
 
 echo "Generating HAProxy configuration with:"
 echo "  EMQX1_HOST: ${EMQX1_HOST}"
