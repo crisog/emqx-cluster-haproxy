@@ -1,6 +1,6 @@
 # EMQX Cluster with HAProxy Load Balancer
 
-A 3-node EMQX MQTT broker cluster with HAProxy load balancing, designed for deployment on Railway or local Docker Compose environments.
+A Railway template for production-ready 3-node EMQX MQTT broker cluster with HAProxy load balancing. Also runs locally via Docker Compose for development and testing.
 
 <p align="center">
   <a href="https://railway.com/deploy/emqx-cluster-haproxy?referralCode=crisog">
@@ -49,6 +49,14 @@ docker-compose up -d
 ### Railway Deployment
 
 Click the deploy button above. After deployment, find the admin password in the HAProxy service environment variables (`EMQX_DASHBOARD__DEFAULT_PASSWORD`).
+
+Railway deployments include:
+- Automatic TLS termination at the edge
+- Unified HTTP endpoint routing WebSocket (`/mqtt`), stats (`/stats`), and dashboard traffic
+- Auto-generated secure credentials
+- Private networking for cluster communication
+
+See [TEMPLATE.md](TEMPLATE.md) for detailed deployment documentation.
 
 ## Configuration
 
