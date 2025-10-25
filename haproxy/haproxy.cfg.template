@@ -55,6 +55,19 @@ frontend mqtt_ws_frontend
   mode tcp
   default_backend mqtt_ws_backend
 
+backend emqx_dashboard_backend
+  mode http
+  balance roundrobin
+  option httpchk GET /api/v5/status
+  server emqx1 ${EMQX1_HOST}:${EMQX_DASHBOARD_PORT} check
+  server emqx2 ${EMQX2_HOST}:${EMQX_DASHBOARD_PORT} check
+  server emqx3 ${EMQX3_HOST}:${EMQX_DASHBOARD_PORT} check
+
+frontend emqx_dashboard_frontend
+  bind *:18083
+  mode http
+  default_backend emqx_dashboard_backend
+
 frontend stats
   mode http
   bind *:8888

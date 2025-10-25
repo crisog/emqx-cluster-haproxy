@@ -10,8 +10,10 @@ services:
     container_name: emqx1
     environment:
       - EMQX_NODE_NAME=emqx@emqx1.emqx.io
+      - EMQX_NODE__COOKIE=${EMQX_NODE__COOKIE}
       - EMQX_CLUSTER__DISCOVERY_STRATEGY=static
       - EMQX_CLUSTER__STATIC__SEEDS=[emqx@emqx1.emqx.io,emqx@emqx2.emqx.io,emqx@emqx3.emqx.io]
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=${EMQX_DASHBOARD__DEFAULT_PASSWORD:-admin}
     hostname: emqx1.emqx.io
     networks:
       emqx-network:
@@ -33,8 +35,10 @@ services:
     container_name: emqx2
     environment:
       - EMQX_NODE_NAME=emqx@emqx2.emqx.io
+      - EMQX_NODE__COOKIE=${EMQX_NODE__COOKIE}
       - EMQX_CLUSTER__DISCOVERY_STRATEGY=static
       - EMQX_CLUSTER__STATIC__SEEDS=[emqx@emqx1.emqx.io,emqx@emqx2.emqx.io,emqx@emqx3.emqx.io]
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=${EMQX_DASHBOARD__DEFAULT_PASSWORD:-admin}
     hostname: emqx2.emqx.io
     networks:
       emqx-network:
@@ -56,8 +60,10 @@ services:
     container_name: emqx3
     environment:
       - EMQX_NODE_NAME=emqx@emqx3.emqx.io
+      - EMQX_NODE__COOKIE=${EMQX_NODE__COOKIE}
       - EMQX_CLUSTER__DISCOVERY_STRATEGY=static
       - EMQX_CLUSTER__STATIC__SEEDS=[emqx@emqx1.emqx.io,emqx@emqx2.emqx.io,emqx@emqx3.emqx.io]
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=${EMQX_DASHBOARD__DEFAULT_PASSWORD:-admin}
     hostname: emqx3.emqx.io
     networks:
       emqx-network:
@@ -78,17 +84,19 @@ services:
     image: emqx-haproxy:${HAPROXY_VERSION:-3.2.7-alpine}
     container_name: emqx-haproxy
     environment:
-      - EMQX1_HOST=${EMQX1_HOST:-emqx1}
-      - EMQX2_HOST=${EMQX2_HOST:-emqx2}
-      - EMQX3_HOST=${EMQX3_HOST:-emqx3}
+      - EMQX1_HOST=${EMQX1_HOST:-emqx1.emqx.io}
+      - EMQX2_HOST=${EMQX2_HOST:-emqx2.emqx.io}
+      - EMQX3_HOST=${EMQX3_HOST:-emqx3.emqx.io}
       - EMQX_MQTT_PORT=${EMQX_MQTT_PORT:-1883}
       - EMQX_WS_PORT=${EMQX_WS_PORT:-8083}
+      - EMQX_DASHBOARD_PORT=${EMQX_DASHBOARD_PORT:-18083}
       - EMQX1_WEIGHT=${EMQX1_WEIGHT:-5}
       - EMQX2_WEIGHT=${EMQX2_WEIGHT:-2}
       - EMQX3_WEIGHT=${EMQX3_WEIGHT:-3}
     ports:
       - "1883:1883"
       - "8083:8083"
+      - "18083:18083"
       - "8888:8888"
     sysctls:
       - net.ipv4.ip_unprivileged_port_start=0
