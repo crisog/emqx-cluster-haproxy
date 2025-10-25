@@ -68,9 +68,36 @@ frontend emqx_dashboard_frontend
   mode http
   default_backend emqx_dashboard_backend
 
-frontend stats
+frontend http_public
+  bind *:${PORT:-8080}
   mode http
+
+  acl is_websocket hdr(Connection) -i upgrade
+  acl is_websocket hdr(Upgrade) -i websocket
+  acl mqtt_ws_path path_beg /mqtt
+  use_backend mqtt_ws_http_backend if is_websocket mqtt_ws_path
+
+  acl is_stats path_beg /stats
+  use_backend stats_backend if is_stats
+
+  default_backend emqx_dashboard_backend
+
+backend mqtt_ws_http_backend
+  mode http
+  balance roundrobin
+  server emqx1 ${EMQX1_HOST}:${EMQX_WS_PORT} check
+  server emqx2 ${EMQX2_HOST}:${EMQX_WS_PORT} check
+  server emqx3 ${EMQX3_HOST}:${EMQX_WS_PORT} check
+
+backend stats_backend
+  mode http
+  stats enable
+  stats uri /stats
+  stats refresh 10s
+
+frontend stats_internal
   bind *:8888
+  mode http
   stats enable
   stats uri /stats
   stats refresh 10s
