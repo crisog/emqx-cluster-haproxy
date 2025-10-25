@@ -80,8 +80,8 @@ services:
     build:
       context: ./haproxy
       args:
-        HAPROXY_VERSION: ${HAPROXY_VERSION:-3.2.7-alpine}
-    image: emqx-haproxy:${HAPROXY_VERSION:-3.2.7-alpine}
+        HAPROXY_VERSION: ${HAPROXY_VERSION:-3.2.7}
+    image: emqx-haproxy:${HAPROXY_VERSION:-3.2.7}
     container_name: emqx-haproxy
     environment:
       - EMQX1_HOST=${EMQX1_HOST:-emqx1.emqx.io}
